@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 import urllib
 import json
 import re
+import sys
 
 url_base = "http://www.urbandictionary.com"
 url_start = url_base + "/browse.php?word=aa"
@@ -21,7 +22,7 @@ def find_next_url(page):
 def find_words(page):
     for link in page.find_all("a"):
         link_url = link.get("href")
-        if link_url.startswith(word_link_prefix):
+        if link_url and link_url.startswith(word_link_prefix):
             yield link_url.split("=")[1]
 
 def query_word_definitions(word):
@@ -31,15 +32,16 @@ def query_word_definitions(word):
 
 def find_definitions(url=url_start):
     while url:
-        page = BeautifulSoup(urllib.query(index_url), "lxml")
+        print >> sys.stderr, url
+        page = BeautifulSoup(urllib.urlopen(url), "lxml")
         for word in find_words(page):
             yield (word, query_word_definitions(word))
         url = find_next_url(page)
 
 def get_spelling_variants(definitions):
     for d in definitions:
-        m = re.search(r"way of spelling (.*)(\.|\b|$)", d):
-        if m.group(0):
+        m = re.search(r"way of spelling (.*)(\.|\b|$)", d)
+        if m:
             yield m.group(1)
 
 if __name__ == "__main__":
