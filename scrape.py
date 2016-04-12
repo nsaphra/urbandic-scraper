@@ -39,12 +39,19 @@ def find_definitions(url=url_start):
         url = find_next_url(page)
 
 def get_spelling_variants(definitions):
+    variants = set()
     for d in definitions:
-        m = re.search(r"way of spelling (\w+)(\.|\b|$)", d)
+        m = re.search(r"spelling( of| for|) (\w+)(\.|\b|$)", d)
         if m:
-            yield m.group(1)
+            variant = m.group(2)
+            if variant not in variants:
+                variants.add(variant)
+                yield variant
 
 if __name__ == "__main__":
-    for (word, definitions) in find_definitions():
+    url = url_start
+    if len(sys.argv) > 1:
+        url = sys.argv[1]
+    for (word, definitions) in find_definitions(url=url):
         for variant in get_spelling_variants(definitions):
             print "%s\t%s" % (word, variant)
