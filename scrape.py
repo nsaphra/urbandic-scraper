@@ -40,7 +40,7 @@ def find_definitions(url=url_start):
 
 def get_spelling_variants(definitions):
     for d in definitions:
-        m = re.search(r"way of spelling (.*)(\.|\b|$)", d)
+        m = re.search(r"way of spelling (\w+)(\.|\b|$)", d)
         if m:
             yield m.group(1)
 
