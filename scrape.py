@@ -58,6 +58,7 @@ if __name__ == "__main__":
             # just so I don't have to deal with unicode issues later ...
             try:
                 print u'%s\t%s' % (word, variant)
+                sys.stdout.flush()
             except UnicodeEncodeError:
                 print >> sys.stderr, "UnicodeEncodeError"
                 continue
