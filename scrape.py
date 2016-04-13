@@ -27,7 +27,7 @@ def find_words(page):
 
 def query_word_definitions(word):
     response = urllib.urlopen(url_define + word)
-    data = json.loads(response.read())
+    data = json.loads(response.read().decode('utf-8', 'ignore'))
     return [x['definition'] for x in data['list']]
 
 def find_definitions(url=url_start):
