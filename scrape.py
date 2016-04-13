@@ -54,4 +54,4 @@ if __name__ == "__main__":
         url = sys.argv[1]
     for (word, definitions) in find_definitions(url=url):
         for variant in get_spelling_variants(definitions):
-            print u"%s\t%s" % (word, variant)
+            print word + u"\t" + variant
