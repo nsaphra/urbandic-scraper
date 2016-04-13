@@ -41,7 +41,7 @@ def find_definitions(url=url_start):
 def get_spelling_variants(definitions):
     variants = set()
     for d in definitions:
-        m = re.search(r"spelling( of| for|) (\w+)(\.|,|$)", d)
+        m = re.search(r"spelling( of| for|) (.+)(\.|,|$)", d)
         if m:
             variant = m.group(2)
             if variant not in variants:
