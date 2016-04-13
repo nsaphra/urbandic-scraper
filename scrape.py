@@ -54,6 +54,8 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         url = sys.argv[1]
     for (word, definitions) in find_definitions(url=url):
+        if '+' in word:
+            continue # only interested in unigrams right now
         for variant in get_spelling_variants(definitions):
             # just so I don't have to deal with unicode issues later ...
             try:
