@@ -33,7 +33,8 @@ def query_word_definitions(word):
 def find_definitions(url=url_start):
     while url:
         print >> sys.stderr, url
-        page = BeautifulSoup(urllib.urlopen(url), "lxml")
+        result = urllib.urlopen(url).read().decode('utf-8', 'ignore')
+        page = BeautifulSoup(result, "lxml")
         for word in find_words(page):
             yield (word, query_word_definitions(word))
         url = find_next_url(page)
@@ -41,7 +42,7 @@ def find_definitions(url=url_start):
 def get_spelling_variants(definitions):
     variants = set()
     for d in definitions:
-        m = re.search(r"spelling( of| for|) (.+)(\.|,|$)", d)
+        m = re.search(ur"spelling( of| for|) (.+?)(\.|,|$)", d)
         if m:
             variant = m.group(2)
             if variant not in variants:
@@ -54,4 +55,9 @@ if __name__ == "__main__":
         url = sys.argv[1]
     for (word, definitions) in find_definitions(url=url):
         for variant in get_spelling_variants(definitions):
-            print word + u"\t" + variant
+            # just so I don't have to deal with unicode issues later ...
+            try:
+                print u'%s\t%s' % (word, variant)
+            except UnicodeEncodeError:
+                print >> sys.stderr, "UnicodeEncodeError"
+                continue
