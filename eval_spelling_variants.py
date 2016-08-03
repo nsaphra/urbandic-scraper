@@ -67,3 +67,4 @@ def evaluate_all_pairs():
     print("%i pairs correct" % correct_cnt)
     print("%i pairs in top 20" % top20_cnt)
 
+evaluate_all_pairs()

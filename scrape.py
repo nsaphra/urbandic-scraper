@@ -28,7 +28,8 @@ def find_words(page):
 def query_word_definitions(word):
     response = urllib.urlopen(url_define + word)
     data = json.loads(response.read().decode('utf-8', 'ignore'))
-    return [x['definition'] for x in data['list']]
+    for x in data['list']:
+        yield (x['word'], x['definition'])
 
 def find_definitions(url=url_start):
     while url:
@@ -36,26 +37,26 @@ def find_definitions(url=url_start):
         result = urllib.urlopen(url).read().decode('utf-8', 'ignore')
         page = BeautifulSoup(result, "lxml")
         for word in find_words(page):
-            yield (word, query_word_definitions(word))
+            if '+' in word:
+                continue # only interested in unigrams right now
+            for (w, d) in query_word_definitions(word):
+                yield (w, d)
         url = find_next_url(page)
 
-def get_spelling_variants(definitions):
+def get_spelling_variants(definition):
     variants = set()
     for d in definitions:
-        m = re.search(ur"spelling( of| for|) (.+?)(\.|,|$)", d)
+        m = re.search(ur"spelling[^\.,]*( of| for|)[^\.,]* ('|\"|\[)(?P<respelled>\w+)('|\"|\])",
+                      definition)
         if m:
             variant = m.group(2)
-            if variant not in variants:
-                variants.add(variant)
-                yield variant
+            yield variant
 
 if __name__ == "__main__":
     url = url_start
     if len(sys.argv) > 1:
         url = sys.argv[1]
     for (word, definitions) in find_definitions(url=url):
-        if '+' in word:
-            continue # only interested in unigrams right now
         for variant in get_spelling_variants(definitions):
             # just so I don't have to deal with unicode issues later ...
             try:
